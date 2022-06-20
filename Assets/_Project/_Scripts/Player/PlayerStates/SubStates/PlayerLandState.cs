@@ -9,29 +9,18 @@ namespace PlayerController2D
 
         }
 
-        public override void Enter()
-        {
-            base.Enter();
-        }
-
-        public override void Exit()
-        {
-            base.Exit();
-        }
-
-        public override void StateCheck()
-        {
-            base.StateCheck();
-        }
-
         public override void UpdateLogic()
         {
             base.UpdateLogic();
-        }
 
-        public override void UpdatePhysics()
-        {
-            base.UpdatePhysics();
+            if (inputX != 0)
+            {
+                stateMachine.ChangeState(player.moveState);
+            }
+            else if (isAnimationFinished)
+            {
+                stateMachine.ChangeState(player.idleState);
+            }
         }
     }
 }

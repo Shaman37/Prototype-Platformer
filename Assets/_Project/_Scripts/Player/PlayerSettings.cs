@@ -10,6 +10,11 @@ namespace PlayerController2D
 
         [Header("Jump State")]
         public float jumpVelocity = 15f;
+        public int   jumpsAmount = 2;
+
+        [Header("In Air Sate")]
+        public float coyoteTime = 0.2f;
+        public float variableJumpHeightMultiplier = 0.5f;
 
         [Header("Check Variables")]
         public float groundCheckRadius = 0.3f;

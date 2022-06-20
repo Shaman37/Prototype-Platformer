@@ -6,7 +6,8 @@ namespace PlayerController2D
     {
         protected int inputX;
 
-        private bool jumpInput;
+        private bool _jumpInput;
+        private bool _isGrounded;
 
 
         /// <summary>
@@ -20,6 +21,8 @@ namespace PlayerController2D
         public override void Enter()
         {
             base.Enter();
+
+            player.jumpState.ResetJumpsLeft();
         }
 
         public override void Exit()
@@ -30,6 +33,8 @@ namespace PlayerController2D
         public override void StateCheck()
         {
             base.StateCheck();
+
+            _isGrounded = player.CheckIfGrounded();
         }
 
         public override void UpdateLogic()
@@ -37,12 +42,17 @@ namespace PlayerController2D
             base.UpdateLogic();
 
             inputX = player.inputController.normalizedInputX;
-            jumpInput = player.inputController.jumpInput;
+            _jumpInput = player.inputController.jumpInput;
 
-            if (jumpInput)
+            if (_jumpInput && player.jumpState.CheckIfCanJump())
             {
                 player.inputController.UseJumpInput();
                 stateMachine.ChangeState(player.jumpState);
+            }
+            else if (!_isGrounded)
+            {
+                player.inAirState.StartCoyoteTime();
+                stateMachine.ChangeState(player.inAirState);
             }
         }
 

@@ -46,7 +46,7 @@ namespace PlayerController2D
             moveState = new PlayerMoveState(this, stateMachine, _playerSettings, "move");
             jumpState = new PlayerJumpState(this, stateMachine, _playerSettings, "inAir");
             inAirState = new PlayerInAirState(this, stateMachine, _playerSettings, "inAir"); 
-            landState = new PlayerLandState(this, stateMachine, _playerSettings, "land");
+            landState = new PlayerLandState(this, stateMachine, _playerSettings, "hasLanded");
 
             animator = GetComponent<Animator>();
             inputController = GetComponent<PlayerInputController>();
@@ -94,6 +94,10 @@ namespace PlayerController2D
             facingDirection *= -1;
             transform.Rotate(0.0f, 180.0f, 0.0f);
         }
+
+        private void TriggerAnimation() => stateMachine.currentState.TriggerAnimation();
+
+        private void FinishAnimation() => stateMachine.currentState.FinishAnimation();
 
         public bool CheckIfGrounded()
         {

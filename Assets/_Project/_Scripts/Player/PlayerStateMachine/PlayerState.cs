@@ -12,9 +12,10 @@ namespace PlayerController2D
 		 	protected Player 			 player;
 		    protected PlayerStateMachine stateMachine;
 		    protected PlayerSettings     playerSettings;
-			protected float 			 startTime;
-			
-			private string _animatorBoolName;
+			protected float 			 stateStartTime;
+        protected bool isAnimationFinished;
+
+        protected string animatorBoolName;
 
 	   #endregion
 
@@ -26,7 +27,7 @@ namespace PlayerController2D
             this.player = player;
             this.stateMachine = stateMachine;
             this.playerSettings = playerSettings;
-            this._animatorBoolName = animatorBoolName;
+            this.animatorBoolName = animatorBoolName;
         }
 
 		/// <summary>
@@ -35,10 +36,11 @@ namespace PlayerController2D
 		public virtual void Enter()
 		{
             StateCheck();
-            player.animator.SetBool(_animatorBoolName, true);
-            startTime = Time.time;
+            player.animator.SetBool(animatorBoolName, true);
+            stateStartTime = Time.time;
+            isAnimationFinished = false;
 
-			Debug.Log(_animatorBoolName);
+            Debug.Log(animatorBoolName);
         }
 
 		/// <summary>
@@ -46,16 +48,13 @@ namespace PlayerController2D
         /// </summary>
 		public virtual void Exit()
 		{
-            player.animator.SetBool(_animatorBoolName, false);
+            player.animator.SetBool(animatorBoolName, false);
 		}
 
 		/// <summary>
         /// 	Gets called on Update (every frame).
         /// </summary>
-		public virtual void UpdateLogic()
-		{
-			
-		}
+		public virtual void UpdateLogic() {}
 
 		/// <summary>
         /// 	Gets called on Fixed Update.
@@ -68,9 +67,10 @@ namespace PlayerController2D
 		/// <summary>
         /// 	Gets called when a variable check is needed. Mostly used on 'Enter' and 'UpdatePhysics' methods.
         /// </summary>
-		public virtual void StateCheck()
-		{
-			
-		}
+		public virtual void StateCheck() {}
+
+		public virtual void TriggerAnimation() {}
+
+        public virtual void FinishAnimation() => isAnimationFinished = true;
     }
 }

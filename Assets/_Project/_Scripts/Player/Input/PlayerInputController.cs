@@ -9,6 +9,15 @@ namespace PlayerController2D
         public int normalizedInputY { get; private set; }
         public Vector2 rawMovementInput { get; private set; }
         public bool jumpInput { get; private set; }
+        public bool jumpInputStop { get; private set; }
+
+        private float jumpStartTime;
+        [SerializeField] private float inputHoldTime = 0.2f;
+
+        private void Update() 
+        {
+            CheckInputHoldTime();
+        }
 
         public void OnMoveInput(InputAction.CallbackContext context)
         {
@@ -22,6 +31,21 @@ namespace PlayerController2D
             if (context.started)
             {
                 jumpInput = true;
+                jumpInputStop = false;
+                jumpStartTime = Time.time;
+            }
+
+            if (context.canceled)
+            {
+                jumpInputStop = true;
+            }
+        }
+
+        private void CheckInputHoldTime() 
+        {
+            if (Time.time >= jumpStartTime + inputHoldTime)
+            {
+                jumpInput = false;
             }
         }
 
