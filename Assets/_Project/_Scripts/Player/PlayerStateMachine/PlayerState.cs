@@ -9,11 +9,12 @@ namespace PlayerController2D
 	{
        #region [0] - Fields
 
-		 	protected Player 			 player;
-		    protected PlayerStateMachine stateMachine;
-		    protected PlayerSettings     playerSettings;
-			protected float 			 stateStartTime;
+		protected Player 			 player;
+		protected PlayerStateMachine stateMachine;
+		protected PlayerSettings     playerSettings;
+		protected float 			 stateStartTime;
         protected bool isAnimationFinished;
+        protected bool isExitingState;
 
         protected string animatorBoolName;
 
@@ -39,6 +40,7 @@ namespace PlayerController2D
             player.animator.SetBool(animatorBoolName, true);
             stateStartTime = Time.time;
             isAnimationFinished = false;
+            isExitingState = false;
 
             Debug.Log(animatorBoolName);
         }
@@ -49,7 +51,8 @@ namespace PlayerController2D
 		public virtual void Exit()
 		{
             player.animator.SetBool(animatorBoolName, false);
-		}
+            isExitingState = true;
+        }
 
 		/// <summary>
         /// 	Gets called on Update (every frame).

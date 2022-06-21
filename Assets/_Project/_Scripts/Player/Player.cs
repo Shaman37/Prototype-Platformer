@@ -6,12 +6,15 @@ namespace PlayerController2D
 	{
         #region [0] - State Fields
 
-        public PlayerStateMachine stateMachine { get; private set; }
-        public PlayerIdleState    idleState { get; private set; }
-        public PlayerMoveState    moveState { get; private set; }
-        public PlayerJumpState    jumpState { get; private set; }
-        public PlayerInAirState   inAirState { get; private set; }
-        public PlayerLandState    landState { get; private set; }
+        public PlayerStateMachine   stateMachine { get; private set; }
+
+        public PlayerIdleState      idleState { get; private set; }
+        public PlayerMoveState      moveState { get; private set; }
+        public PlayerJumpState      jumpState { get; private set; }
+        public PlayerInAirState     inAirState { get; private set; }
+        public PlayerLandState      landState { get; private set; }
+        public PlayerWallSlideState wallSlideState { get; private set; }
+        public PlayerWallJumpState  wallJumpState { get; private set; }
 
         #endregion
 
@@ -33,6 +36,7 @@ namespace PlayerController2D
         
         #region [3] - Check Fields
         [SerializeField] private Transform _groundCheck;
+        [SerializeField] private Transform _wallCheck;
         
         #endregion
 
@@ -47,10 +51,12 @@ namespace PlayerController2D
             jumpState = new PlayerJumpState(this, stateMachine, _playerSettings, "inAir");
             inAirState = new PlayerInAirState(this, stateMachine, _playerSettings, "inAir"); 
             landState = new PlayerLandState(this, stateMachine, _playerSettings, "hasLanded");
+            wallSlideState = new PlayerWallSlideState(this, stateMachine, _playerSettings, "wallSliding");
+            wallJumpState = new PlayerWallJumpState(this, stateMachine, _playerSettings, "inAir");
 
             animator = GetComponent<Animator>();
-            inputController = GetComponent<PlayerInputController>();
             rigidBody = GetComponent<Rigidbody2D>();
+            inputController = GetComponent<PlayerInputController>();
         }
 
  	    private void Start()
@@ -72,6 +78,15 @@ namespace PlayerController2D
         }
 
         #endregion
+
+        public void SetVelocity(float velocity, Vector2 angle, int direction)
+        {
+            angle.Normalize();
+            Vector2 newVelocity = new Vector2(angle.x * velocity * direction, angle.y * velocity);
+            
+            rigidBody.velocity = newVelocity;
+            currentVelocity = newVelocity;
+        }
 
         public void SetVelocityX(float velocityX)
         {
@@ -102,6 +117,21 @@ namespace PlayerController2D
         public bool CheckIfGrounded()
         {
             return Physics2D.OverlapCircle(_groundCheck.position, _playerSettings.groundCheckRadius, _playerSettings.groundLayer);
+        }
+
+        public bool CheckIfTouchingFacingWall()
+        {
+            return Physics2D.Raycast(_wallCheck.position, Vector2.right * facingDirection, _playerSettings.wallCheckDistance, _playerSettings.groundLayer);
+        }
+        
+        public bool CheckIfTouchingBackWall()
+        {
+            return Physics2D.Raycast(_wallCheck.position, Vector2.right * -facingDirection, _playerSettings.wallCheckDistance, _playerSettings.groundLayer);
+        }
+
+        public bool CheckIfFalling()
+        {
+            return currentVelocity.y <= 0.0f;
         }
 
         public void CheckIfShouldFlip(int inputX)

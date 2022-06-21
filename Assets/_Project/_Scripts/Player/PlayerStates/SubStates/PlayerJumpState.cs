@@ -14,10 +14,11 @@ namespace PlayerController2D
         public override void Enter()
         {
             player.animator.SetInteger("jumpsLeft", jumpsLefts);
-
             base.Enter();
 
-            player.SetVelocityY(playerSettings.jumpVelocity);
+            player.inputController.UseJumpInput();
+            
+            player.SetVelocityY(playerSettings.jumpForce);
             player.inAirState.SetIsJumping();
 
             isAbilityDone = true;

@@ -29,7 +29,7 @@ namespace PlayerController2D
         {
             base.UpdateLogic();
 
-            if (inputX != 0f)
+            if (inputX != 0.0f && !isExitingState)
             {
                 stateMachine.ChangeState(player.moveState);
             }

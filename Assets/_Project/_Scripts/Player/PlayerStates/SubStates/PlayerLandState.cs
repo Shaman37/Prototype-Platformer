@@ -13,14 +13,17 @@ namespace PlayerController2D
         {
             base.UpdateLogic();
 
-            if (inputX != 0)
-            {
-                stateMachine.ChangeState(player.moveState);
-            }
-            else if (isAnimationFinished)
-            {
-                stateMachine.ChangeState(player.idleState);
-            }
+           if (!isExitingState)
+           {
+             if (inputX != 0)
+             {
+                 stateMachine.ChangeState(player.moveState);
+             }
+             else if (isAnimationFinished)
+             {
+                 stateMachine.ChangeState(player.idleState);
+             }
+           }
         }
     }
 }

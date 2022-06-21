@@ -46,7 +46,6 @@ namespace PlayerController2D
 
             if (_jumpInput && player.jumpState.CheckIfCanJump())
             {
-                player.inputController.UseJumpInput();
                 stateMachine.ChangeState(player.jumpState);
             }
             else if (!_isGrounded)

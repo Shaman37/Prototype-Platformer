@@ -30,7 +30,7 @@ namespace PlayerController2D
             player.CheckIfShouldFlip(inputX);
             player.SetVelocityX(playerSettings.movementVelocity * inputX);
 
-            if (inputX == 0f)
+            if (inputX == 0f && !isExitingState)
             {
                 stateMachine.ChangeState(player.idleState);
             }
