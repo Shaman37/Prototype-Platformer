@@ -3,19 +3,26 @@ using UnityEngine;
 namespace PlayerController2D
 {
     public class PlayerInAirState : PlayerState
-    { 
+    {   
+        // Input fields
         private int   _inputX;
-        private bool  _isGrounded;
-        private bool  _isTouchingFacingWall;
-        private bool  _wasTouchingFacingWall;
-        private bool  _isTouchingBackWall;
-        private bool  _wasTouchingBackWall;
         private bool  _jumpInput;
         private bool  _jumpInputStop;
+        private bool  _dashInput;
+
+        // Check fields
+        private bool  _isGrounded;
+        private bool  _isJumping;
+        private bool  _wasTouchingFacingWall;
+        private bool  _isTouchingFacingWall;
+        private bool  _wasTouchingBackWall;
+        private bool  _isTouchingBackWall;
+        private bool  _isTouchingLedge;
+
+        // Game Feel fields
         private bool  _coyoteTime;
         private bool  _wallJumpCoyoteTime;
         private float _wallJumpCoyoteTimeStart;
-        private bool  _isJumping;
 
         public PlayerInAirState(Player player, PlayerStateMachine stateMachine, PlayerSettings playerSettings, string animatorBoolName) : base(player, stateMachine, playerSettings, animatorBoolName)
         {
@@ -25,11 +32,18 @@ namespace PlayerController2D
         public override void Enter()
         {
             base.Enter();
+
+            player.dashState.ResetDash();
         }
 
         public override void Exit()
         {
             base.Exit();
+
+            _wasTouchingBackWall = false;
+            _isTouchingBackWall = false;
+            _wasTouchingFacingWall = false;
+            _isTouchingFacingWall = false;
         }
 
         public override void StateCheck()
@@ -42,6 +56,12 @@ namespace PlayerController2D
             _isGrounded = player.CheckIfGrounded();
             _isTouchingFacingWall = player.CheckIfTouchingFacingWall();
             _isTouchingBackWall = player.CheckIfTouchingBackWall();
+            _isTouchingLedge = player.CheckIfTouchingLedge();
+
+            if (_isTouchingFacingWall && !_isTouchingLedge)
+            {
+                player.ledgeState.SetInitialPosition(player.transform.position);
+            }
 
             if (!_wallJumpCoyoteTime && !_isTouchingBackWall && !_isTouchingFacingWall && (_wasTouchingBackWall || _wasTouchingFacingWall))
             {
@@ -59,6 +79,7 @@ namespace PlayerController2D
             _inputX = player.inputController.normalizedInputX;
             _jumpInput = player.inputController.jumpInput;
             _jumpInputStop = player.inputController.jumpInputStop;
+            _dashInput = player.inputController.dashInput;
 
             ApplyJumpMultiplier();
 
@@ -66,6 +87,11 @@ namespace PlayerController2D
             if (_isGrounded && player.currentVelocity.y < 0.01f)
             {
                 stateMachine.ChangeState(player.landState);
+            }
+            // [TRANSITION] -> Ledge State
+            else if (_isTouchingFacingWall && !_isTouchingLedge && !_isGrounded)
+            {
+                stateMachine.ChangeState(player.ledgeState);
             }
             // [TRANSITION] -> Wall Jump State
             else if (_jumpInput && (_isTouchingFacingWall || _isTouchingBackWall || _wallJumpCoyoteTime))
@@ -84,6 +110,11 @@ namespace PlayerController2D
             else if (_isTouchingFacingWall && _inputX == player.facingDirection && player.CheckIfFalling())
             {
                 stateMachine.ChangeState(player.wallSlideState);
+            }
+            // [TRANSITION] -> Dash State
+            else if (_dashInput && player.dashState.CheckIfCanDash())
+            {
+                stateMachine.ChangeState(player.dashState);
             }
             // Air Mobility
             else

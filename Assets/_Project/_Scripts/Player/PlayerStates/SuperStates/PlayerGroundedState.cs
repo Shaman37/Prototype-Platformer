@@ -4,9 +4,12 @@ namespace PlayerController2D
 {
     public class PlayerGroundedState : PlayerState
     {
+        // Input
         protected int inputX;
-
         private bool _jumpInput;
+        private bool _dashInput;
+
+        // Checks
         private bool _isGrounded;
 
 
@@ -23,6 +26,7 @@ namespace PlayerController2D
             base.Enter();
 
             player.jumpState.ResetJumpsLeft();
+            player.dashState.ResetDash();
         }
 
         public override void Exit()
@@ -43,15 +47,23 @@ namespace PlayerController2D
 
             inputX = player.inputController.normalizedInputX;
             _jumpInput = player.inputController.jumpInput;
+            _dashInput = player.inputController.dashInput;
 
+            // [TRANSITION] -> Jump State
             if (_jumpInput && player.jumpState.CheckIfCanJump())
             {
                 stateMachine.ChangeState(player.jumpState);
             }
+            // [TRANSITION] -> In Air State
             else if (!_isGrounded)
             {
                 player.inAirState.StartCoyoteTime();
                 stateMachine.ChangeState(player.inAirState);
+            }
+            // [TRANSITION] -> Dash State
+            else if (_dashInput && player.dashState.CheckIfCanDash())
+            {
+                stateMachine.ChangeState(player.dashState);
             }
         }
 

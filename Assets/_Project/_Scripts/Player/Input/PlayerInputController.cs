@@ -10,13 +10,17 @@ namespace PlayerController2D
         public Vector2 rawMovementInput { get; private set; }
         public bool jumpInput { get; private set; }
         public bool jumpInputStop { get; private set; }
+        public bool dashInput { get; private set; }
+        public bool dashInputStop { get; private set; }
 
         private float jumpStartTime;
+        private float dashStartTime;
         [SerializeField] private float inputHoldTime = 0.2f;
 
         private void Update() 
         {
             CheckInputHoldTime();
+            CheckDashHoldTime();
         }
 
         public void OnMoveInput(InputAction.CallbackContext context)
@@ -41,6 +45,21 @@ namespace PlayerController2D
             }
         }
 
+        public void OnDashInput(InputAction.CallbackContext context)
+        {
+            if (context.started)
+            {
+                dashInput = true;
+                dashInputStop = false;
+                dashStartTime = Time.time;
+            }
+
+            if (context.canceled)
+            {
+                dashInputStop = true;
+            }
+        }
+
         private void CheckInputHoldTime() 
         {
             if (Time.time >= jumpStartTime + inputHoldTime)
@@ -49,6 +68,15 @@ namespace PlayerController2D
             }
         }
 
+        private void CheckDashHoldTime() 
+        {
+            if (Time.time >= dashStartTime + inputHoldTime)
+            {
+                dashInput = false;
+            }
+        }
+
         public void UseJumpInput() => jumpInput = false;
+        public void UseDashInput() => dashInput = false;
     }
 }

@@ -6,6 +6,7 @@ namespace PlayerController2D
     {
         protected bool _isGrounded;
         protected bool _isTouchingWall;
+        protected bool _isTouchingLedge;
         protected bool _jumpInput;
         protected int  _inputX;
 
@@ -30,6 +31,12 @@ namespace PlayerController2D
 
             _isGrounded = player.CheckIfGrounded();
             _isTouchingWall = player.CheckIfTouchingFacingWall();
+            _isTouchingLedge = player.CheckIfTouchingLedge();
+
+            if (_isTouchingWall && !_isTouchingLedge)
+            {
+                player.ledgeState.SetInitialPosition(player.transform.position);
+            }
         }
 
         public override void TriggerAnimation()
@@ -61,6 +68,10 @@ namespace PlayerController2D
 			else if (!_isTouchingWall || _inputX != player.facingDirection)
 			{
                 stateMachine.ChangeState(player.inAirState);
+            }
+            else if (_isTouchingWall && !_isTouchingLedge)
+            {
+                stateMachine.ChangeState(player.ledgeState);
             }
         }
 

@@ -15,6 +15,10 @@ namespace PlayerController2D
         public PlayerLandState      landState { get; private set; }
         public PlayerWallSlideState wallSlideState { get; private set; }
         public PlayerWallJumpState  wallJumpState { get; private set; }
+        public PlayerCrouchState    crouchState { get; private set; }
+        public PlayerLedgeState     ledgeState { get; private set; }
+        public PlayerDashState      dashState { get; private set; }
+        public PlayerSlideState     slideState { get; private set; }
 
         #endregion
 
@@ -37,6 +41,7 @@ namespace PlayerController2D
         #region [3] - Check Fields
         [SerializeField] private Transform _groundCheck;
         [SerializeField] private Transform _wallCheck;
+        [SerializeField] private Transform _ledgeCheck;
         
         #endregion
 
@@ -48,11 +53,15 @@ namespace PlayerController2D
 
             idleState = new PlayerIdleState(this, stateMachine, _playerSettings, "idle");
             moveState = new PlayerMoveState(this, stateMachine, _playerSettings, "move");
+            crouchState = new PlayerCrouchState(this, stateMachine, _playerSettings, "crouching");
             jumpState = new PlayerJumpState(this, stateMachine, _playerSettings, "inAir");
             inAirState = new PlayerInAirState(this, stateMachine, _playerSettings, "inAir"); 
             landState = new PlayerLandState(this, stateMachine, _playerSettings, "hasLanded");
             wallSlideState = new PlayerWallSlideState(this, stateMachine, _playerSettings, "wallSliding");
             wallJumpState = new PlayerWallJumpState(this, stateMachine, _playerSettings, "inAir");
+            ledgeState = new PlayerLedgeState(this, stateMachine, _playerSettings, "ledgeState");
+            dashState = new PlayerDashState(this, stateMachine, _playerSettings, "dashing");
+            slideState = new PlayerSlideState(this, stateMachine, _playerSettings, "isSliding");
 
             animator = GetComponent<Animator>();
             rigidBody = GetComponent<Rigidbody2D>();
@@ -79,14 +88,29 @@ namespace PlayerController2D
 
         #endregion
 
+        #region [5] - Set Methods
+            
         public void SetVelocity(float velocity, Vector2 angle, int direction)
         {
             angle.Normalize();
+
             Vector2 newVelocity = new Vector2(angle.x * velocity * direction, angle.y * velocity);
             
             rigidBody.velocity = newVelocity;
             currentVelocity = newVelocity;
         }
+    
+        public void SetVelocity(float velocity, Vector2 direction)
+        {
+            direction.Normalize();
+
+            Vector2 newVelocity = direction * velocity;
+            
+            rigidBody.velocity = newVelocity;
+            currentVelocity = newVelocity;
+        }
+        
+        public void SetVelocityZero() => rigidBody.velocity = Vector2.zero;
 
         public void SetVelocityX(float velocityX)
         {
@@ -104,16 +128,10 @@ namespace PlayerController2D
             currentVelocity = newVelocity;
         }
 
-        public void Flip()
-        {
-            facingDirection *= -1;
-            transform.Rotate(0.0f, 180.0f, 0.0f);
-        }
+        #endregion
 
-        private void TriggerAnimation() => stateMachine.currentState.TriggerAnimation();
-
-        private void FinishAnimation() => stateMachine.currentState.FinishAnimation();
-
+        #region [6] - Check Methods
+            
         public bool CheckIfGrounded()
         {
             return Physics2D.OverlapCircle(_groundCheck.position, _playerSettings.groundCheckRadius, _playerSettings.groundLayer);
@@ -122,6 +140,10 @@ namespace PlayerController2D
         public bool CheckIfTouchingFacingWall()
         {
             return Physics2D.Raycast(_wallCheck.position, Vector2.right * facingDirection, _playerSettings.wallCheckDistance, _playerSettings.groundLayer);
+        }
+        public bool CheckIfTouchingLedge()
+        {
+            return Physics2D.Raycast(_ledgeCheck.position, Vector2.right * facingDirection, _playerSettings.ledgeCheckDistance, _playerSettings.groundLayer);
         }
         
         public bool CheckIfTouchingBackWall()
@@ -140,6 +162,41 @@ namespace PlayerController2D
             {
                 Flip();
             }
+        }
+
+        #endregion
+    
+        public void Flip()
+        {
+            facingDirection *= -1;
+            transform.Rotate(0.0f, 180.0f, 0.0f);
+        }
+
+        private void TriggerAnimation() => stateMachine.currentState.TriggerAnimation();
+
+        private void FinishAnimation() => stateMachine.currentState.FinishAnimation();
+        
+        public Vector2 CalculateCornerPosition()
+        {
+            Vector2 rayOrigin = Vector2.zero;
+            Vector2 rayDirection = Vector2.right;
+            float rayDistance = 0;
+
+            // Calculate distance to wall (X)
+            rayOrigin.Set(_wallCheck.position.x, _wallCheck.position.y);
+            rayDirection = Vector2.right * facingDirection;
+            rayDistance = _playerSettings.wallCheckDistance;
+            RaycastHit2D hitX = Physics2D.Raycast(rayOrigin, rayDirection, rayDistance, _playerSettings.groundLayer);
+
+            // Calculate distance to ledge ground (Y)
+            rayOrigin.Set(_ledgeCheck.position.x + (hitX.distance * facingDirection), 0.0f);
+            rayDirection = Vector2.down;
+            rayDistance = _ledgeCheck.position.y - _wallCheck.position.y;
+            RaycastHit2D hitY = Physics2D.Raycast(rayOrigin, rayDirection, rayDistance, _playerSettings.groundLayer);
+
+            Vector2 cornerPosition = new Vector2(_wallCheck.position.x + (hitX.distance * facingDirection), _ledgeCheck.position.y - hitY.distance);
+
+            return cornerPosition;
         }
     }
 }
