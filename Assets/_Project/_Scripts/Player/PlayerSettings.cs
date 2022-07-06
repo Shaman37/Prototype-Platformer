@@ -7,6 +7,9 @@ namespace PlayerController2D
 	{
         [Header("Move State")]
         public float movementVelocity = 10f;
+        public float accelerationGround = 0.1f;
+        public float accelerationAir = 0.2f;
+        public float velocitySmoothingX;
 
         [Header("Jump State")]
         public float jumpForce = 15f;
@@ -26,9 +29,10 @@ namespace PlayerController2D
         public Vector2 wallJumpAngle = new Vector2(1.0f, 2.0f);
 
         [Header("Ledge State")]
-        public Vector2 startOffset;
-        public Vector2 climbOffset;
-        public Vector2 stopOffset;
+        public Vector2 holdOffset;
+        public Vector2 endOffset;
+        public Vector2 climbControlPoint1;
+        public Vector2 climbControlPoint2;
 
         [Header("Dash State")]
         public float dashCooldown = 0.5f;
@@ -37,6 +41,18 @@ namespace PlayerController2D
         public float dashVelocity = 30f;
         public float dashDrag = 10f;
         public float dashAfterImageDistance = 0.5f;
+
+        [Header("Crouch State")]
+        public float crouchMovementVelocity = 5f;
+        public float crouchingColliderHeight = 0.85f;
+        public float standingColliderHeight = 1.21f;
+
+        [Header("Slide State")]
+        public float slideMovementVelocity = 7f;
+        public float slideCooldown = 0.5f;
+        public float maxSlideTime = 1f;
+        public float minSlideTime = 0.4f;
+        public float slideDrag = 5f;
 
         [Header("Check Variables")]
         public float groundCheckRadius = 0.2f;

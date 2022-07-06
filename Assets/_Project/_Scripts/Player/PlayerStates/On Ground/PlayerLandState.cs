@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace PlayerController2D
 {
-    public class PlayerLandState : PlayerGroundedState
+    public class PlayerLandState : PlayerOnGroundState
     {
         public PlayerLandState(Player player, PlayerStateMachine stateMachine, PlayerSettings playerSettings, string animatorBoolName) : base(player, stateMachine, playerSettings, animatorBoolName)
         {
@@ -15,14 +15,16 @@ namespace PlayerController2D
 
            if (!isExitingState)
            {
-             if (inputX != 0)
-             {
-                 stateMachine.ChangeState(player.moveState);
-             }
-             else if (isAnimationFinished)
-             {
-                 stateMachine.ChangeState(player.idleState);
-             }
+                // [TRANSITION] -> Move State
+                if (inputX != 0)
+                {
+                        stateMachine.ChangeState(player.moveState);
+                }
+                // [TRANSITION] -> Idle State
+                else if (isAnimationFinished)
+                {
+                        stateMachine.ChangeState(player.idleState);
+                }
            }
         }
     }

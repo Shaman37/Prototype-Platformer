@@ -12,6 +12,7 @@ namespace PlayerController2D
         public bool jumpInputStop { get; private set; }
         public bool dashInput { get; private set; }
         public bool dashInputStop { get; private set; }
+        public bool crouchInput { get; private set; }
 
         private float jumpStartTime;
         private float dashStartTime;
@@ -57,6 +58,19 @@ namespace PlayerController2D
             if (context.canceled)
             {
                 dashInputStop = true;
+            }
+        }
+
+        public void OnCrouchInput(InputAction.CallbackContext context)
+        {
+            if (context.started)
+            {
+                crouchInput = true;
+            }
+
+            if (context.canceled)
+            {
+                crouchInput = false;
             }
         }
 

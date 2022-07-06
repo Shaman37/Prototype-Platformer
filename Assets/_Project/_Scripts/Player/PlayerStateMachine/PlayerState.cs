@@ -13,10 +13,10 @@ namespace PlayerController2D
 		protected PlayerStateMachine stateMachine;
 		protected PlayerSettings     playerSettings;
 		protected float 			 stateStartTime;
-        protected bool isAnimationFinished;
-        protected bool isExitingState;
-
-        protected string animatorBoolName;
+		protected float 			 stateElapsedTime;
+        protected bool               isAnimationFinished;
+        protected bool               isExitingState;
+        protected string             animatorBoolName;
 
 	   #endregion
 
@@ -39,10 +39,11 @@ namespace PlayerController2D
             StateCheck();
             player.animator.SetBool(animatorBoolName, true);
             stateStartTime = Time.time;
+            stateElapsedTime = stateStartTime;
             isAnimationFinished = false;
             isExitingState = false;
 
-            Debug.Log(animatorBoolName);
+            Debug.Log(stateMachine.currentState);
         }
 
 		/// <summary>
@@ -57,7 +58,10 @@ namespace PlayerController2D
 		/// <summary>
         /// 	Gets called on Update (every frame).
         /// </summary>
-		public virtual void UpdateLogic() {}
+		public virtual void UpdateLogic() 
+        {
+            stateElapsedTime += Time.deltaTime;
+        }
 
 		/// <summary>
         /// 	Gets called on Fixed Update.

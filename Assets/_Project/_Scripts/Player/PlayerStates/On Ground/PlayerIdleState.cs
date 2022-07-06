@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace PlayerController2D
 {
-    public class PlayerIdleState : PlayerGroundedState
+    public class PlayerIdleState : PlayerOnGroundState
     {
         public PlayerIdleState(Player player, PlayerStateMachine stateMachine, PlayerSettings playerSettings, string animatorBoolName) : base(player, stateMachine, playerSettings, animatorBoolName)
         {
@@ -29,9 +29,18 @@ namespace PlayerController2D
         {
             base.UpdateLogic();
 
-            if (inputX != 0.0f && !isExitingState)
+            if (!isExitingState)
             {
-                stateMachine.ChangeState(player.moveState);
+                // [TRANSITION] -> Move State
+                if (inputX != 0)
+                {
+                    stateMachine.ChangeState(player.moveState);
+                }
+                // [TRANSITION] -> Crouch Idle State
+                else if (crouchInput || isTouchingCeiling)
+                {
+                    stateMachine.ChangeState(player.crouchIdleState);
+                }    
             }
         }
 

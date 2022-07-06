@@ -22,15 +22,23 @@ MonoBehaviour:
   wallJumpCoyoteTime: 0.2
   wallJumpTime: 0.4
   wallJumpAngle: {x: 1, y: 2}
-  startOffset: {x: 0.32, y: 0.7}
-  climbOffset: {x: 0.3, y: 0.1}
-  stopOffset: {x: 0.3, y: 0.7}
+  holdOffset: {x: 0.3, y: 0.6}
+  endOffset: {x: 0.23, y: 0.5}
+  climbControlPoint1: {x: 0, y: 0.45}
+  climbControlPoint2: {x: -0.54, y: 0.11}
   dashCooldown: 0.25
   minDashTime: 0.1
   maxDashTime: 0.3
   dashVelocity: 30
   dashDrag: 10
   dashAfterImageDistance: 0.5
+  crouchMovementVelocity: 5
+  crouchingColliderHeight: 0.85
+  standingColliderHeight: 1.21
+  slideMovementVelocity: 7
+  slideCooldown: 0.5
+  slideDuration: 0.5
+  slideDrag: 5
   groundCheckRadius: 0.2
   wallCheckDistance: 0.5
   groundLayer:

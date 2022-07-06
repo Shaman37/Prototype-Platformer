@@ -2,21 +2,25 @@ using UnityEngine;
 
 namespace PlayerController2D
 {
-    public class PlayerGroundedState : PlayerState
+    public class PlayerOnGroundState : PlayerState
     {
         // Input
         protected int inputX;
+        protected int inputY;
+        protected Vector2 rawInput;
         private bool _jumpInput;
         private bool _dashInput;
+        protected bool crouchInput;
 
         // Checks
         private bool _isGrounded;
+        protected bool isTouchingCeiling;
 
 
         /// <summary>
         /// 	Grounded State Constructor.
         /// </summary>
-        public PlayerGroundedState(Player player, PlayerStateMachine stateMachine, PlayerSettings playerSettings, string animatorBoolName) : base(player, stateMachine, playerSettings, animatorBoolName)
+        public PlayerOnGroundState(Player player, PlayerStateMachine stateMachine, PlayerSettings playerSettings, string animatorBoolName) : base(player, stateMachine, playerSettings, animatorBoolName)
         {
 
         }
@@ -27,6 +31,7 @@ namespace PlayerController2D
 
             player.jumpState.ResetJumpsLeft();
             player.dashState.ResetDash();
+            player.slideState.ResetSlide();
         }
 
         public override void Exit()
@@ -39,6 +44,7 @@ namespace PlayerController2D
             base.StateCheck();
 
             _isGrounded = player.CheckIfGrounded();
+            isTouchingCeiling = player.CheckForCeling();
         }
 
         public override void UpdateLogic()
@@ -46,8 +52,12 @@ namespace PlayerController2D
             base.UpdateLogic();
 
             inputX = player.inputController.normalizedInputX;
+            inputY = player.inputController.normalizedInputY;
+            rawInput = player.inputController.rawMovementInput;
+
             _jumpInput = player.inputController.jumpInput;
             _dashInput = player.inputController.dashInput;
+            crouchInput = player.inputController.crouchInput;
 
             // [TRANSITION] -> Jump State
             if (_jumpInput && player.jumpState.CheckIfCanJump())

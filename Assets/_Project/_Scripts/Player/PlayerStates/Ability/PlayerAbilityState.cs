@@ -37,10 +37,12 @@ namespace PlayerController2D
 
             if (isAbilityDone)
             {
+                // [TRANSITION] -> Idle State
                 if (_isGrounded && player.currentVelocity.y < 0.01f)
                 {
                     stateMachine.ChangeState(player.idleState);
                 }
+                // [TRANSITION] -> In Air State
                 else
                 {
                     stateMachine.ChangeState(player.inAirState);

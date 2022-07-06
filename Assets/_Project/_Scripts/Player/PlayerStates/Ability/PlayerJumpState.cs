@@ -25,7 +25,7 @@ namespace PlayerController2D
             jumpsLefts--;
         }
 
-        public bool CheckIfCanJump() => jumpsLefts > 0 ? true : false;
+        public bool CheckIfCanJump() => jumpsLefts > 0 && !player.CheckForCeling() ? true : false;
 
         public void ResetJumpsLeft() => jumpsLefts = playerSettings.jumpsAmount;
 

@@ -32,7 +32,7 @@ namespace PlayerController2D
             _isGrounded = player.CheckIfGrounded();
             _isTouchingWall = player.CheckIfTouchingFacingWall();
             _isTouchingLedge = player.CheckIfTouchingLedge();
-
+            
             if (_isTouchingWall && !_isTouchingLedge)
             {
                 player.ledgeState.SetInitialPosition(player.transform.position);
@@ -56,19 +56,23 @@ namespace PlayerController2D
             _inputX = player.inputController.normalizedInputX;
             _jumpInput = player.inputController.jumpInput;
 
+            // [TRANSITION] -> Wall Jump State
             if (_jumpInput)
             {
                 player.wallJumpState.DetermineWallJumpDirection(_isTouchingWall);
                 stateMachine.ChangeState(player.wallJumpState);
             }
+            // [TRANSITION] -> Idle State
             else if (_isGrounded)
 			{
                 stateMachine.ChangeState(player.idleState);
             }
+            // [TRANSITION] -> In Air State
 			else if (!_isTouchingWall || _inputX != player.facingDirection)
 			{
                 stateMachine.ChangeState(player.inAirState);
             }
+            // [TRANSITION] -> On Ledge State
             else if (_isTouchingWall && !_isTouchingLedge)
             {
                 stateMachine.ChangeState(player.ledgeState);

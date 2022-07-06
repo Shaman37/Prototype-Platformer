@@ -2,8 +2,9 @@ using UnityEngine;
 
 namespace PlayerController2D
 {
-    public class PlayerMoveState : PlayerGroundedState
+    public class PlayerMoveState : PlayerOnGroundState
     {
+
         public PlayerMoveState(Player player, PlayerStateMachine stateMachine, PlayerSettings playerSettings, string animatorBoolName) : base(player, stateMachine, playerSettings, animatorBoolName)
         {
         }
@@ -28,17 +29,32 @@ namespace PlayerController2D
             base.UpdateLogic();
 
             player.CheckIfShouldFlip(inputX);
-            player.SetVelocityX(playerSettings.movementVelocity * inputX);
-
-            if (inputX == 0f && !isExitingState)
+            player.SetVelocityX(playerSettings.movementVelocity * rawInput.x);
+            
+            if (!isExitingState)
             {
-                stateMachine.ChangeState(player.idleState);
+                // [TRANSITION] -> Idle State
+                if (inputX == 0)
+                {
+                    stateMachine.ChangeState(player.idleState);
+                }
+                // [TRANSITION] -> Crouch Move State
+                else if (crouchInput)
+                {
+                    stateMachine.ChangeState(player.crouchMoveState);
+                }
+                // [TRANSITION] -> Slide State
+                else if (inputY == -1 && player.slideState.CheckIfCanSlide())
+                {
+                    stateMachine.ChangeState(player.slideState);
+                }
             }
         }
 
         public override void UpdatePhysics()
         {
             base.UpdatePhysics();
+
         }
     }
 }
